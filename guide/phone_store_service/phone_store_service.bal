@@ -6,14 +6,17 @@ import ballerina/io;
 
 
 public http:Request backendreq;
+
 // Type definition for a phone order
 type phoneOrder record {
     string customerName;
     string address;
     string contactNumber;
     string orderedPhoneName;
-
 };
+
+// Global variable containing all the available phones
+json[] phoneInventory = ["Apple:190000", "Samsung:150000", "Nokia:80000", "HTC:40000", "Huawei:100000"];
 
 // Initialize a JMS connection with the provider
 // 'providerUrl' and 'initialContextFactory' vary based on the JMS provider you use
@@ -23,28 +26,17 @@ jms:Connection jmsConnection = new({
         providerUrl: "tcp://localhost:61616"
     });
 
-// Initialize a queue sender using the created session
-endpoint jms:QueueSender jmsProducer {
-    session:jmsSession,
-    queueName:"OrderQueue"
-};
-
 // Initialize a JMS session on top of the created connection
 jms:Session jmsSession = new(jmsConnection, {
         acknowledgementMode: "AUTO_ACKNOWLEDGE"
     });
 
 
-// Global variable containing all the available phones
-json[] phoneInventory = ["Apple:190000", "Samsung:150000", "Nokia:80000", "HTC:40000", "Huawei:100000"];
-
-
-
-endpoint http:Client phonedetailsproviderServiceEP {
-    url: "http://localhost:9091/phonestore1/placeOrder1"
-    //http://localhost:9090/phonestore/placeOrder
+// Initialize a queue sender using the created session
+endpoint jms:QueueSender jmsProducer {
+    session:jmsSession,
+    queueName:"OrderQueue"
 };
-
 
 // Service endpoint
 endpoint http:Listener listener {
@@ -126,8 +118,6 @@ service<http:Service> phonestoreService bind listener {
             // Construct a success message for the response
             responseMessage = {"Message":"Your order is successfully placed. Ordered phone will be delivered soon"};
 
-            //log:printInfo("order Delivery details  added to the delivery  Queue; CustomerName: '" + newOrder.customerName +
-            // "', OrderedPhone: '" + newOrder.orderedPhoneName + "';");
         }
         else {
             // If phone is not available, construct a proper response message to notify user
@@ -195,11 +185,12 @@ service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
     }
 }
 
+endpoint http:Client phonedetailsproviderServiceEP {
+    url: "http://localhost:9091/phonestore1/placeOrder1"
 
-///////////////////////////////////////////////////////////////////////////////////
+};
 
-
-///////////////////////////////////////////////////////////////////////////////
+//Creating the Delivery Queue
 
 jms:Connection jmsConnection2 = new({
         initialContextFactory: "org.apache.activemq.jndi.ActiveMQInitialContextFactory",
@@ -219,12 +210,10 @@ jms:Session jmsSession2 = new(jmsConnection2, {
 
 
 
-
 // Service endpoint
 endpoint http:Listener listener1 {
     port:9091
 };
-
 
 @http:ServiceConfig {basePath:"/phonestore1"}
 // phone store service, which allows users to order phones online for delivery
@@ -301,8 +290,6 @@ service<http:Service> phonedetailsproviderService bind listener1 {
             // Construct a success message for the response
             responseMessage = {"Message":"Your order is successfully placed. Ordered phone will be delivered soon"};
 
-            //log:printInfo("order Delivery details  added to the delivery  Queue; CustomerName: '" + newOrder.customerName +
-            // "', OrderedPhone: '" + newOrder.orderedPhoneName + "';");
         }
         else {
             // If phone is not available, construct a proper response message to notify user
@@ -314,14 +301,6 @@ service<http:Service> phonedetailsproviderService bind listener1 {
         _ = caller -> respond(response);
     }
 
-    // Resource that allows users to get a list of all the available phones
-    @http:ResourceConfig {methods:["GET"], produces:["application/json"]}
-    getPhoneList(endpoint client, http:Request request) {
-        http:Response response;
-        // Send json array 'phoneInventory' as the response, which contains all the available phones
-        response.setJsonPayload(phoneInventory);
-        _ = client -> respond(response);
-    }
 }
 
 
