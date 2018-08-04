@@ -57,27 +57,38 @@ Producer.
 
 Ballerina is a complete programming language that supports custom project structures. Use the following package structure for this guide.
 ```
-Message_Construction_Patterns
+message_construction_patterns
  └── guide
+      ├── phone_store_service
+      │    ├── phone_store_service.bal
+      │    └── tests
+      │         └── phone_store_service.bal
       └── phone_order_delivery_service
-           ├── phone_order_delivery_service.bal
-           └── tests
+           ├──order_delivery_service.bal
+           └── tests
                 └── phone_order_delivery_service_test.bal
-     
+
 ```
 
 - Create the above directories in your local machine and also create empty `.bal` files
 
-- Then open the terminal and navigate to `Message_Construction_Patterns/guide` and run Ballerina project initializing toolkit.
+- Then open the terminal and navigate to `message_construction_patterns/guide` and run Ballerina project initializing toolkit.
 ```bash
    $ ballerina init
 ```
 ### Developing the service
 
-Let's get started with the implementation of the `phone_order_delivery_service`, which acts as the JMS message consumer. 
+Let's get started with the implementation of the phone_store_service, which acts as the message Replier. 
 Refer to the code attached below. Inline comments added for better understanding.
 
-##### phone_order_delivery_service.bal
+##### phone_store_service.bal
+
+``````
+code
+``````
+Now let's consider the implementation of order_delivery_service.bal which acts as the message Requestor.
+
+#### order_delivery_service.bal
 
 ``````
 code
@@ -88,38 +99,40 @@ code
 ### Invoking the service
 
 - First, start the `Apache ActiveMQ` server by entering the following command in a terminal from `<ActiveMQ_BIN_DIRECTORY>`.
+
 ```bash
    $ ./activemq start
 ```
 
-- Navigate to `messaging-with-jms-queues/guide` and run the following commands in separate terminals to start both the JMS producer `bookstoreService` and  JMS consumer `orderDeliverySystem`.
+- Navigate to `message_construction_patterns/guide` and run the following commands in separate terminals to start both `phone_store_service` and `order_delivery_service`.
 ```bash
-   $ ballerina run bookstore_service
+   $ ballerina run phone_store_service.bal
 ```
 
 ```bash
    $ ballerina run order_delivery_system
 ```
    
-- Invoke the `bookstoreService` by sending a GET request to check the available books.
+- Invoke the `phone_store_service` by sending a GET request to check the available books.
 
 ```bash
-   curl -v -X GET localhost:9090/bookstore/getBookList
+   curl -v -X GET localhost:9090/phonestore/getPhoneList
 ```
 
-  The bookstoreService sends a response similar to the following.
+  The phone_store_service sends a response similar to the following.
 ```
    < HTTP/1.1 200 OK
-   ["Tom Jones","The Rainbow","Lolita","Atonement","Hamlet"]
+   ["Apple:190000","Samsung:150000","Nokia:80000","HTC:40000","Huawei:100000"]
 ```
    
 - Place an order using the following command.
 
 ```bash
    curl -v -X POST -d \
-   '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
-   "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
-   "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
+   '{"Name":"John", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
+   "ContactNumber":"+94718930874", "PhoneName":"Apple:190000"}' \
+   "http://localhost:9090/phonestore/placeOrder" -H "Content-Type:application/json"
+   
 ```
 
   The bookstoreService sends a response similar to the following.
@@ -130,19 +143,29 @@ code
 
   Sample Log Messages:
 ```bash
-    INFO  [bookstore_service] - New order added to the JMS Queue;
-        CustomerName: 'Bob', OrderedBook: 'The Rainbow';
 
-    INFO  [order_delivery_system] - New order received from the JMS Queue
-    INFO  [order_delivery_system] - Order Details: {"customerName":"Bob", 
-        "address":"20, Palm Grove, Colombo, Sri Lanka", "contactNumber":"+94777123456",
-        "orderedBookName":"The Rainbow"} 
+  INFO  [phone_store_service] - order will be added to the order  Queue; CustomerName: 'Bob', OrderedPhone: 'Apple:190000'; 
+  INFO  [phone_store_service] - New order successfilly received from the Order Queue 
+  INFO  [phone_store_service] - Order Details: {"customerName":"John","address":"20, Palm Grove, Colombo, Sri Lanka","contactNumber":"+94718930874","orderedPhoneName":"Apple:190000"} 
+  
+  Order Details have sent to phone_order_delivery_service.
+
+
+  Order Details have received to phone_order_delivery_service
+  
+  INFO  [phone_order_delivery_service] - order Delivery details  added to the delivery  Queue; CustomerName: 'Bob', OrderedPhone: 'Apple:190000'; 
+  INFO  [phone_order_delivery_service] - New order successfilly received from the Delivery Queue 
+  INFO  [phone_order_delivery_service] - Order Details: {"customerName":"Bob","address":"20, Palm Grove, Colombo, Sri Lanka","contactNumber":"+94777123456","orderedPhoneName":"Apple:190000"} 
+  
+ Delivery Details sent to the customer successfully
+ 
 ```
 
 ### Writing unit tests 
 
 In Ballerina, the unit test cases should be in the same package inside a folder named `tests`.  When writing the test functions the below convention should be followed.
 - Test functions should be annotated with `@test:Config`. See the below example.
+
 ```ballerina
    @test:Config
    function testResourcePlaceOrder() {
@@ -150,11 +173,10 @@ In Ballerina, the unit test cases should be in the same package inside a folder 
   
 This guide contains unit test cases for each resource available in the 'bookstore_service' implemented above. 
 
-To run the unit tests, navigate to `messaging-with-jms-queues/guide` and run the following command. 
+To run the unit tests, navigate to `message_construction_patterns/guide` and run the following command. 
 ```bash
    $ ballerina test
 ```
 
 When running these unit tests, make sure that the JMS Broker is up and running.
 
-To check the implementation of the test file, refer [bookstore_service_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/tests/bookstore_service_test.bal).
