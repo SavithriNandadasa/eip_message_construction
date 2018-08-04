@@ -151,7 +151,7 @@ code
   Order Details have sent to phone_order_delivery_service.
 
 
-  Order Details have received to phone_order_delivery_service
+  Order Details have received from phone_store_service
   
   INFO  [phone_order_delivery_service] - order Delivery details  added to the delivery  Queue; CustomerName: 'Bob', OrderedPhone: 'Apple:190000'; 
   INFO  [phone_order_delivery_service] - New order successfilly received from the Delivery Queue 
@@ -179,4 +179,128 @@ To run the unit tests, navigate to `message_construction_patterns/guide` and run
 ```
 
 When running these unit tests, make sure that the JMS Broker is up and running.
+
+## Deployment
+
+Once you are done with the development, you can deploy the services using any of the methods listed below. 
+
+### Deploying locally
+
+As the first step, you can build Ballerina executable archives (.balx) of the services that we developed above. Navigate to `message_construction_patterns/guide` and run the following command.
+
+```bash
+   $ ballerina build
+```
+
+- Once the .balx files are created inside the target folder, you can run them using the following command. 
+```bash
+   $ ballerina run target/<Exec_Archive_File_Name>
+```
+
+- The successful execution of a service will show us something similar to the following output.
+```
+   ballerina: initiating service(s) in 'phone_store.balx' 
+   ballerina: started HTTP/WS endpoint 0.0.0.0:9090
+   
+   ballerina: initiating service(s) in 'phone_order_delivery_service.balx' 
+   ballerina: started HTTP/WS endpoint 0.0.0.0:9091
+```
+### Deploying on Docker
+
+You can run the service that we developed above as a Docker container.
+As Ballerina platform includes [Ballerina_Docker_Extension](https://github.com/ballerinax/docker), which offers native support for running ballerina programs on containers,
+you just need to add the corresponding Docker annotations to your service code.
+Since this guide requires `ActiveMQ` as a prerequisite, you need a couple of more steps to configure it in a Docker container.   
+
+First let's see how to configure `ActiveMQ` in a Docker container.
+
+- Initially, you need to pull the `ActiveMQ` Docker image using the following command.
+```bash
+   $ docker pull webcenter/activemq
+```
+
+- Then launch the pulled image using the following command. This will start the `ActiveMQ` server in Docker with default configurations.
+```bash
+   $ docker run -d --name='activemq' -it --rm -P webcenter/activemq:latest
+```
+
+- Check whether the `ActiveMQ` container is up and running using the following command.
+```bash
+   $ docker ps
+```
+
+Now let's see how we can deploy the `phone_store_service` and `phone_order_delivery_service` on Docker. We need to import `ballerinax/docker` and use the annotation `@docker:Config` as shown below to enable Docker image generation at build time. 
+
+##### phone_store_service.bal
+```ballerina
+import ballerinax/docker;
+// Other imports
+
+// Type definition for a book order
+
+json[] phoneInventory = ["Apple:190000", "Samsung:150000", "Nokia:80000", "HTC:40000", "Huawei:100000"];
+
+// 'jms:Connection' definition
+
+// 'jms:Session' definition
+
+// 'jms:QueueSender' endpoint definition
+
+@docker:Config {
+    registry:"ballerina.guides.io",
+    name:"bookstore_service",
+    tag:"v1.0"
+}
+
+
+@docker:Expose{}
+endpoint http:Listener listener {
+    port:9090
+};
+
+
+@http:ServiceConfig {basePath:"/phonestore"}
+service<http:Service> phone_store_service bind listener {
+``` 
+Similar to the `phone_store_service.bal`, We define the `@docker:Config` and `@docker:Expose {}` in  `phone_order_delivery_service` for Docker deployment.
+
+- `@docker:Config` annotation is used to provide the basic Docker image configurations for the sample.`@docker:Expose {}` is used to expose the port. 
+
+- Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image using the Docker annotations that you have configured above. Navigate to `message_construction_patterns/guide` and run the following command.  
+  
+```
+   $ballerina build 
+  
+   ./target/phone_store.balx
+        @docker                  - complete 3/3 
+
+        Run following command to start docker container:
+        docker run -d -p 9090:9090 ballerina.guides.io/phone_store_service:v1.0
+
+    ./target/phone_order_delivery_service.balx
+        @docker                  - complete 3/3 
+
+        Run following command to start docker container:
+        docker run -d -p 9091:9091 ballerina.guides.io/phone_order_delivery_service:v1.0
+
+```
+
+- Once you successfully build the Docker image, you can run it with the `` docker run`` command that is shown in the previous step.  
+
+```bash
+  docker run -d -p 9090:9090 ballerina.guides.io/phone_store_service:v1.0
+  docker run -d -p 9091:9091 ballerina.guides.io/phone_order_delivery_service:v1.0  
+```
+
+   Here we run the Docker image with flag`` -p <host_port>:<container_port>`` so that we use the host port 9090 and the container port 9090. Therefore you can access the service through the host port. 
+
+- Verify docker container is running with the use of `` $ docker ps``. The status of the Docker container should be shown as 'Up'. 
+
+- You can access the service using the same curl commands that we've used above.
+```bash
+    curl -v -X POST -d \
+   '{"Name":"John", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
+   "ContactNumber":"+94718930874", "PhoneName":"Apple:190000"}' \
+   "http://localhost:9090/phonestore/placeOrder" -H "Content-Type:application/json"
+```
 
