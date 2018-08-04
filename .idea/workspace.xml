@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="e903c0d5-299c-47b4-9afb-69c522978aa9" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/guide/ballerina-internal.log" beforeDir="false" afterPath="$PROJECT_DIR$/guide/ballerina-internal.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/guide/phone_store_service/phone_store_service.bal" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/guide/phone_store_service/test/phone_store_service_test.bal" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal" beforeDir="false" afterPath="$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,17 +21,26 @@
       <file leaf-file-name="phone_store_service.bal" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/guide/phone_store/phone_store_service.bal">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="631">
-              <caret line="262" lean-forward="true" selection-start-line="76" selection-end-line="262" />
+            <state relative-caret-position="565">
+              <caret line="259" column="60" selection-start-line="259" selection-start-column="48" selection-end-line="259" selection-end-column="60" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="phone_order_delivery_service.bal" pinned="false" current-in-tab="true">
+      <file leaf-file-name="phone_order_delivery_service.bal" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/guide/phone_order_delivery_service/phone_order_delivery_service.bal">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="230" lean-forward="true" selection-start-line="230" selection-end-line="230" />
+            <state relative-caret-position="257">
+              <caret line="210" column="41" lean-forward="true" selection-start-line="210" selection-start-column="41" selection-end-line="210" selection-end-column="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="phone_order_delivery_test.bal" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="814">
+              <caret line="37" column="69" selection-start-line="37" selection-start-column="69" selection-end-line="37" selection-end-column="69" />
             </state>
           </provider>
         </entry>
@@ -76,10 +83,10 @@
         <option value="$PROJECT_DIR$/guide/test/phone_store_service.bal" />
         <option value="$PROJECT_DIR$/guide/test/phone_order_delivery_service_test.bal" />
         <option value="$PROJECT_DIR$/guide/test/phone_store_service_test.bal" />
-        <option value="$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal" />
         <option value="$PROJECT_DIR$/guide/phone_store/test/phone_store_service_test.bal" />
         <option value="$PROJECT_DIR$/guide/phone_store/phone_store_service.bal" />
         <option value="$PROJECT_DIR$/guide/phone_order_delivery_service/phone_order_delivery_service.bal" />
+        <option value="$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal" />
       </list>
     </option>
   </component>
@@ -239,7 +246,7 @@
       <window_info anchor="right" id="Maven Projects" order="3" weight="0.3297162" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32098764" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32098764" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2533389" />
@@ -379,24 +386,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal">
+    <entry file="file://$PROJECT_DIR$/guide/Ballerina.toml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1034">
-          <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
+        <state relative-caret-position="88">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/guide/.ballerina/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/guide/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/guide/phone_store/phone_store_service.bal">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="631">
-          <caret line="262" lean-forward="true" selection-start-line="76" selection-end-line="262" />
+        <state relative-caret-position="565">
+          <caret line="259" column="60" selection-start-line="259" selection-start-column="48" selection-end-line="259" selection-end-column="60" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/guide/phone_order_delivery_service/phone_order_delivery_service.bal">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="230" lean-forward="true" selection-start-line="230" selection-end-line="230" />
+        <state relative-caret-position="257">
+          <caret line="210" column="41" lean-forward="true" selection-start-line="210" selection-start-column="41" selection-end-line="210" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/guide/phone_order_delivery_service/test/phone_order_delivery_test.bal">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="814">
+          <caret line="37" column="69" selection-start-line="37" selection-start-column="69" selection-end-line="37" selection-end-column="69" />
         </state>
       </provider>
     </entry>

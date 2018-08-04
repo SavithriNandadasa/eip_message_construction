@@ -23,7 +23,7 @@ import ballerina/test;
 
 function testResourceOrderDelivey() {
 
-    endpoint http:Client httpEndpoint3 { url:"http://localhost:9091/phonestore1" };
+    endpoint http:Client httpEndpoint3 { url:"http://localhost:9091/deliveryDetails" };
     // Initialize the empty http request
     http:Request req;
     // Construct a request payload
@@ -35,7 +35,7 @@ function testResourceOrderDelivey() {
     };
     req.setJsonPayload(payload);
     // Send a 'post' request and obtain the response
-    http:Response response = check httpEndpoint3->post("/placeOrder1", req);
+    http:Response response = check httpEndpoint3->post("/sendDelivery", req);
     // Expected response code is 200
     test:assertEquals(response.statusCode, 200, msg = "phonestore service did not respond with 200 OK signal!");
     // Check whether the response is as expected
