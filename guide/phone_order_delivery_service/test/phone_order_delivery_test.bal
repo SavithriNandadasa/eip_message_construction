@@ -1,4 +1,3 @@
-
 // Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
@@ -18,30 +17,13 @@
 import ballerina/http;
 import ballerina/test;
 
-// Client endpoint
-endpoint http:Client clientEP {
-    url: "http://localhost:9090/phonestore"
-};
-
-// Function to test 'getBookList' resource
-@test:Config
-function testResourceGetPhoneList() {
-    // Initialize the empty http request
-    http:Request req;
-
-    // Send a 'get' request and obtain the response
-    http:Response response = check clientEP->get("/getPhoneList", message = req);
-    // Expected response code is 200
-    test:assertEquals(response.statusCode, 200, msg = "phonestore service did not respond with 200 OK signal!");
-    // Check whether the response is as expected
-    json resPayload = check response.getJsonPayload();
-    string stringPayload = resPayload.toString();
-    test:assertTrue(stringPayload.contains("Huawei:100000"), msg = "Response mismatch!");
-}
 
 // Function to test 'placeOrder' resource
 @test:Config
-function testResourcePlaceOrder() {
+
+function testResourceOrderDelivey() {
+
+    endpoint http:Client httpEndpoint3 { url:"http://localhost:9091/phonestore1" };
     // Initialize the empty http request
     http:Request req;
     // Construct a request payload
@@ -53,11 +35,13 @@ function testResourcePlaceOrder() {
     };
     req.setJsonPayload(payload);
     // Send a 'post' request and obtain the response
-    http:Response response = check clientEP->post("/placeOrder", req);
+    http:Response response = check httpEndpoint3->post("/placeOrder1", req);
     // Expected response code is 200
     test:assertEquals(response.statusCode, 200, msg = "phonestore service did not respond with 200 OK signal!");
     // Check whether the response is as expected
     json resPayload = check response.getJsonPayload();
-    json expected = { "Message":"Your order is successfully placed. Ordered phone will be delivered soon"};
+    json expected = { "Message": "Your order is successfully placed. Ordered phone will be delivered soon" };
     test:assertEquals(resPayload, expected, msg = "Response mismatch!");
+
 }
+
