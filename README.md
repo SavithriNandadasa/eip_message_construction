@@ -236,7 +236,7 @@ Now let's see how we can deploy the `phone_store_service` and `phone_order_deliv
 import ballerinax/docker;
 // Other imports
 
-// Type definition for a book order
+// Type definition for a phone order
 
 json[] phoneInventory = ["Apple:190000", "Samsung:150000", "Nokia:80000", "HTC:40000", "Huawei:100000"];
 
@@ -303,4 +303,139 @@ Similar to the `phone_store_service.bal`, We define the `@docker:Config` and `@d
    "ContactNumber":"+94718930874", "PhoneName":"Apple:190000"}' \
    "http://localhost:9090/phonestore/placeOrder" -H "Content-Type:application/json"
 ```
+### Deploying on Kubernetes
+
+- You can run the service that we developed above, on Kubernetes. The Ballerina language offers native support to run a Ballerina program on Kubernetes, with the use of Kubernetes annotations that you can include as part of your 
+service code. Also, it will take care of the creation of the Docker images. So you don't need to explicitly create Docker images prior to deploying it on Kubernetes. Refer [Ballerina_Kubernetes_Extension](https://github.com/ballerinax/kubernetes) for more details and samples on Kubernetes deployment with Ballerina. You can also find details on using Minikube to deploy Ballerina programs. 
+
+- Since this guide requires `ActiveMQ` as a prerequisite, you need an additional step to create a pod for `ActiveMQ` and use it with our sample.  
+
+- Navigate to `message_construction_patterns/resources` directory and run the below command to create the ActiveMQ pod by creating a deployment and service for ActiveMQ. You can find the deployment descriptor and service descriptor in the `./resources/kubernetes` folder.
+
+```bash
+   $ kubectl create -f ./kubernetes/
+```
+
+- Now let's see how we can deploy the `phone_store_service` on Kubernetes. We need to import `` ballerinax/kubernetes; `` and use `` @kubernetes `` annotations as shown below to enable kubernetes deployment.
+
+#####  phone_store_service.bal
+
+```ballerina
+import ballerinax/kubernetes;
+// Other imports
+
+// Type definition for a phone order
+
+json[] phoneInventory = ["Apple:190000", "Samsung:150000", "Nokia:80000", "HTC:40000", "Huawei:100000"];
+
+// 'jms:Connection' definition
+
+// 'jms:Session' definition
+
+// 'jms:QueueSender' endpoint definition
+
+@kubernetes:Ingress {
+hostname:"ballerina.guides.io",
+name:"ballerina-guides-phone_store_service",
+path:"/"
+}
+
+@kubernetes:Service {
+serviceType:"NodePort",
+name:"ballerina-guides-phone_store_service"
+}
+
+@kubernetes:Deployment {
+image:"ballerina.guides.io/phone_store_service:v1.0",
+name:"ballerina-guides-phone_store_service"
+}
+
+endpoint http:Listener listener {
+port:9090
+};
+
+@http:ServiceConfig {basePath:"/phonestore"}
+service<http:Service> phone_store_service bind listener {
+``` 
+
+- Here we have used ``  @kubernetes:Deployment `` to specify the Docker image name which will be created as part of building this service. 
+- We have also specified `` @kubernetes:Service `` so that it will create a Kubernetes service, which will expose the Ballerina service that is running on a Pod.  
+- In addition we have used `` @kubernetes:Ingress ``, which is the external interface to access your service (with path `` /`` and host name ``ballerina.guides.io``)
+
+- Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image and the Kubernetes artifacts using the Kubernetes annotations that you have configured above.
+  
+```
+   $ ballerina build 
+   
+   @kubernetes:Service                      - complete 1/1
+   @kubernetes:Ingress                      - complete 1/1
+   @kubernetes:Docker                       - complete 3/3 
+   @kubernetes:Deployment                   - complete 1/1
+  
+   Run following command to deploy kubernetes artifacts:  
+   kubectl apply -f ./target/phone_store_service/kubernetes
+   
+   @kubernetes:Service                      - complete 1/1
+   @kubernetes:Ingress                      - complete 1/1
+   @kubernetes:Docker                       - complete 3/3 
+   @kubernetes:Deployment                   - complete 1/1
+  
+   Run following command to deploy kubernetes artifacts:  
+   kubectl apply -f ./target/phone_order_delivery_service/kubernetes
+  
+   
+```
+
+- You can verify that the Docker image that we specified in `` @kubernetes:Deployment `` is created, by using `` docker images ``. 
+- Also the Kubernetes artifacts related our service, will be generated under `` ./target/phone_store_service/kubernetes`` and ``/target/phone_order_delivery_service/kubernetes``. 
+- Now you can create the Kubernetes deployment using:
+
+```bash
+   $ kubectl apply -f ./target/phone_store_service/kubernetes
+   
+   deployment.extensions "ballerina-guides-phone_store_service" created
+   ingress.extensions "ballerina-guides-phone_store_service" created
+   service "ballerina-guides-phone_store_service" created
+   
+   kubectl apply -f ./target/phone_order_delivery_service/kubernetes
+   
+   deployment.extensions "ballerina-guides-phone_order_delivery_service" created
+   ingress.extensions "ballerina-guides-phone_order_delivery_service" created
+   service "ballerina-guides-phone_order_delivery_service" created
+```
+
+- You can verify Kubernetes deployment, service and ingress are running properly, by using following Kubernetes commands. 
+
+```bash
+   $ kubectl get service
+   $ kubectl get deploy
+   $ kubectl get pods
+   $ kubectl get ingress
+```
+
+- If everything is successfully deployed, you can invoke the service either via Node port or ingress. 
+
+Node Port:
+```bash
+    curl -v -X POST -d \
+   '{"Name":"John", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
+   "ContactNumber":"+94718930874", "PhoneName":"Apple:190000"}' \
+   "http://localhost:9090/phonestore/placeOrder" -H "Content-Type:application/json"  
+```
+
+Ingress:
+
+Add `/etc/hosts` entry to match hostname. 
+``` 
+   127.0.0.1 ballerina.guides.io
+```
+
+Access the service 
+```bash
+    curl -v -X POST -d \
+   '{"Name":"John", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
+   "ContactNumber":"+94718930874", "PhoneName":"Apple:190000"}' \
+   "http://localhost:9090/phonestore/placeOrder" -H "Content-Type:application/json" 
+```
+
 
